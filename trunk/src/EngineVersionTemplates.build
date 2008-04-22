@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<project name="EngineVersionTemplates.build" default="InitVersion" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+
+  <!-- Parametros de entrada -->
+  <!-- Descomentar estas propiedades para test -->
+  <!--
+  <property name ="target.dir" value =".\Web\App_Code"/>
+  <property name ="Entity" value="Test"/>
+  <property name ="entity" value="test"/>
+  <property name ="increment.version" value ="true"/>
+  -->
+
+  <property name ="templates.dir" value ="${target.dir}\templates"/>
+  <property name ="build.number.file" value ="${templates.dir}\Build.Number"/>
+
+
+  <target name="loadTasks">
+    <property name="diffTask.dir" value="C:\PuntoNet\Desarrollo2005\TemplateNant\NAnt.DiffTask\bin\Debug" />
+    <loadtasks assembly="${nant::get-base-directory()}\NAnt.Contrib.Tasks.dll" />
+    <loadtasks assembly="${diffTask.dir}\NAnt.DiffTasks.dll" />
+  </target>
+
+  <target name ="CreateFileVersion" if ="${not file::exists(build.number.file)}">
+    <echo message ="Tarea a implementar proximamente"/>
+  </target>
+
+
+  <!--  1.Incrementa la version
+        2.Crea un subdirectorio con el numero de version ${version.dir}
+        3.Copia los templates activos dentro de este subdirectorio ${version.dir} -->
+
+  <target name ="InitVersion"  depends ="loadTasks">
+    <if test="${increment.version}">
+      <version buildtype="Increment" revisiontype="Increment" path="${build.number.file}"/>
+      <property name ="version.dir" value ="${templates.dir}\${buildnumber.version}"/>
+      <mkdir dir="${version.dir}"/>
+      <property name ="generated.dir" value ="${version.dir}\Generated"/>
+      <mkdir dir="${generated.dir}"/>
+      <property name ="backup.dir" value ="${version.dir}\Backup"/>
+      <mkdir dir="${backup.dir}"/>
+
+    </if>
+
+    <if test="${not increment.version}">
+      <version buildtype="NoIncrement" path="${build.number.file}"/>
+      <property name ="version.dir" value ="${templates.dir}\${buildnumber.major}.${buildnumber.minor}.${buildnumber.build}.0"/>
+      <property name ="generated.dir" value ="${version.dir}\Generated"/>
+      <property name ="backup.dir" value ="${version.dir}\Backup"/>
+    </if>
+
+
+    <!-- Hace una copia de los templates-->
+    <copy todir="${version.dir}">
+      <fileset basedir="${templates.dir}">
+        <include name="*.cs" />
+        <include name="*.aspx" />
+      </fileset>
+    </copy>
+
+    <!-- Definido en el build especifico -->
+    <call target="Generate"/>
+  </target>
+
+  <target name ="restoreversion">
+    <copy file="${backup.dir}\${target.file}" tofile ="${target.dir}\${target.file}" overwrite ="false" />
+  </target>
+
+  <!-- ************************************************** -->
+  <!-- Targets llamados de los Generate.build especificos -->
+  <!-- ************************************************** -->
+
+  <!-- Hace backup del archivo existente -->
+  <target name ="dobackup">
+    <copy file="${target.dir}\${target.file}" tofile="${backup.dir}\${target.file}"
+        if ="${file::exists(target.dir + '\' + target.file)}" />
+  </target>
+
+  <!-- Copia el archivo generado en el archivo final, ignorando los cambios -->
+  <target name ="generateovertarget">
+    <copy file="${generated.dir}\${target.file}" tofile ="${target.dir}\${target.file}"
+          overwrite ="true" />
+  </target>
+  
+  <!-- Ejecuta un diff entre la version actual del usuario y la "nueva" version generada y 
+       aplica los cambio -->
+  <target name ="dodiffdefault">
+    <if test="${file::exists(target.dir + '\' + target.file)}">
+      <diff source="${backup.dir}\${target.file}" destination="${generated.dir}\${target.file}"
+            merge="${target.dir}\${target.file}" />
+    </if>
+    <if test="${not file::exists(target.dir + '\' + target.file)}">
+      <copy file="${generated.dir}\${target.file}" tofile ="${target.dir}\${target.file}" overwrite ="false" />
+    </if>
+  </target>
+
+
+</project>

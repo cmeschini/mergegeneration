@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<project name="Templates" default="CallEngineVersion" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+
+  <!-- incluye el "engine de versionado" -->
+  <property name ="engine.dir" value ="C:\PuntoNet\Desarrollo2005\TemplateNant"/>
+  <include buildfile ="${engine.dir}\EngineVersionTemplates.build"/>
+  
+  <!-- Parametros de entrada para el "engine de versionado" -->
+  <property name ="target.dir" value="..\" />
+  <property name ="Entity" value="Test"/><!-- Modificar aqui el nombre de la entidad -->
+  <property name ="entity" value="test"/>
+  <property name ="increment.version" value ="true"/>
+
+  <!-- Parametros de salida del "engine de versionado". -->
+                  <!-- Descomentar para test!!! -->
+  <!-- 
+  <property name ="templates.dir" value="." />
+  <property name ="generated.dir" value=".\version\Generated"/>
+  -->
+  
+  <target name="CallEngineVersion">
+    <call target="InitVersion" />
+  </target>
+
+  <!-- Interfaz con el "engine de versionado" -->
+  <target name ="Generate">
+    <call target ="GenerateAspx"/>
+  </target>
+
+  <!-- Un target 2 template -->
+  <target name ="GenerateAspx">
+    <property name ="template.file" value ="Edit_Entity0.aspx"/>
+    <property name ="target.file" value ="Edit${Entity}.aspx"/>
+    <copy file="${templates.dir}\${template.file}" tofile="${generated.dir}\${target.file}" >
+      <filterchain>
+        <replacetokens begintoken="_" endtoken="0">
+          <token key="Entity" value="${Entity}" />
+          <token key="__entity" value="${entity}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+    <!-- Hace backup del archivo existente -->
+    <call target ="dobackup"/>
+
+    <!-- Copia el archivo generado en el archivo final o 
+         hace un diff y escribe los cambios correspondientes.
+         Descomentar lo que corresponda -->
+    <!-- 
+    <call target ="generateovertarget"/>
+    -->
+    <call target ="dodiffdefault"/>
+    
+
+    <property name ="template2.file" value ="Edit_Entity0.aspx.cs"/>
+    <property name ="target2.file" value ="Edit${Entity}.aspx.cs"/>
+    <copy file="${templates.dir}\${template2.file}" tofile="${generated.dir}\${target2.file}" >
+      <filterchain>
+        <replacetokens begintoken="_" endtoken="0">
+          <token key="Entity" value="${Entity}" />
+          <token key="__entity" value="${entity}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+    
+    <!-- Hace backup del archivo existente  (idem "dobackup")-->
+    <copy file="${target.dir}\${target2.file}" tofile="${backup.dir}\${target2.file}" />
+    <!-- Copia el archivo generado en el archivo final (idem "generateovertarget") -->
+    <copy file="${generated.dir}\${target2.file}" tofile ="${target.dir}\${target2.file}"
+          overwrite ="true" />
+
+  </target>
+</project>
