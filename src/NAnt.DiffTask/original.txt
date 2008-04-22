@@ -1,0 +1,35 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+
+/// <summary>
+/// Summary description for Persona
+/// </summary>
+public class Persona
+{
+	public Persona()
+	{
+        this._name = "Persona";
+	}
+
+/*R*/    private string _name1;
+/*R*/    public string Name
+/*R*/    {
+/*R*/        get { return _name1; }
+/*R*/        set { _name1 = value; }
+/*R*/    }
+
+/*N*/    private int _age;
+/*N*/    public int Age
+/*N*/    {
+/*N*/        get { return _age; }
+/*N*/        set { _age = value; }
+/*N*/    }
+
+}

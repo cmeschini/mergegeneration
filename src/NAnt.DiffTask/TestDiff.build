@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="TestDiff" default="InitTest" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+
+
+  <target name="loadTasks">
+    <property name="diffTask.dir" value="C:\PuntoNet\Desarrollo2005\TemplateNant\NAnt.DiffTask\bin\Debug" />
+    <loadtasks assembly="${diffTask.dir}\NAnt.DiffTasks.dll" />
+  </target>
+
+  <target name ="InitTest" depends ="loadTasks">
+    <property name ="source.file" value ="original.txt"/>
+    <property name ="destination.file" value ="generada.nueva.txt"/>
+    <property name ="merge.file" value ="final.txt"/>
+
+    <diff source="${source.file}" destination="${destination.file}" 
+          merge="${merge.file}"/>
+
+  </target>
+
+</project>
+
